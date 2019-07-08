@@ -27,56 +27,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker
+package com.raywenderlich.android.notemaker.features.addnote
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.view.Window
-import android.view.WindowManager
+import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.raywenderlich.android.notemaker.features.notesoverview.NotesOverviewActivity
+import androidx.lifecycle.ViewModelProviders
+import com.raywenderlich.android.notemaker.R
+import com.raywenderlich.android.notemaker.data.model.Note
+import kotlinx.android.synthetic.main.activity_add_note.*
 
-/**
- * Splash Screen with the app icon and name at the center, this is also the launch screen and
- * opens up in fullscreen mode. Once launched it waits for 2 seconds after which it opens the
- * NotesOverviewActivity
- */
-class SplashActivity : AppCompatActivity() {
+class AddNoteActivity : AppCompatActivity() {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+    companion object {
 
-    makeFullScreen()
+        fun newIntent(context: Context) = Intent(context, AddNoteActivity::class.java)
+    }
 
-    setContentView(R.layout.activity_splash)
+    private lateinit var viewModel: AddNoteViewModel
 
-    // Using a handler to delay loading the NotesOverviewActivity
-    Handler().postDelayed({
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_add_note)
 
-      // Start activity
-      startActivity(Intent(this, NotesOverviewActivity::class.java))
+        supportActionBar?.title = "Add Note"
 
-      // Animate the loading of new activity
-      overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+        viewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
+    }
 
-      // Close this activity
-      finish()
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_add_note, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
-    }, 2000)
-  }
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-  private fun makeFullScreen() {
-    // Remove Title
-    requestWindowFeature(Window.FEATURE_NO_TITLE)
+        R.id.action_save_changes -> {
+            val title = titleEditText.text.toString()
+            val note = noteEditText.text.toString()
+            viewModel.saveNote(Note(title, note, -1))
+            finish()
+            true
+        }
 
-    // Make Fullscreen
-    window.setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    )
-
-    // Hide the toolbar
-    supportActionBar?.hide()
-  }
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
+    }
 }
