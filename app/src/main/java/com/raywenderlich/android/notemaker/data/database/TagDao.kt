@@ -34,22 +34,30 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.raywenderlich.android.notemaker.data.model.Tag
+import io.reactivex.Completable
+import io.reactivex.Single
 
 @Dao
 interface TagDao {
 
   @Query("SELECT * FROM tag")
-  fun getAll(): List<Tag>
+  fun getAll(): Single<List<Tag>>
 
   @Query("SELECT * FROM tag WHERE id IN (:tagIds)")
-  fun loadAllByIds(tagIds: IntArray): List<Tag>
+  fun loadAllByIds(tagIds: IntArray): Single<List<Tag>>
 
   @Query("SELECT * FROM tag WHERE id LIKE :id")
-  fun findById(id: Int): Tag
+  fun findById(id: Int): Single<Tag>
+
+  @Query("SELECT id FROM tag WHERE title LIKE :tag")
+  fun findIdByTag(tag: String): Single<Long>
 
   @Insert
-  fun insertAll(vararg tags: Tag)
+  fun insertAll(vararg tags: Tag): Completable
+
+  @Insert
+  fun insert(tag: Tag): Single<Long>
 
   @Delete
-  fun delete(tag: Tag)
+  fun delete(tag: Tag): Completable
 }

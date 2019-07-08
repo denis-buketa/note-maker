@@ -34,7 +34,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Tag(
-    @PrimaryKey val id: Int,
-    @ColumnInfo(name = "title") val title: String?
-)
+data class Tag(@ColumnInfo(name = "title") val title: String?) {
+
+  @PrimaryKey(autoGenerate = true)
+  var id: Long = 0
+}

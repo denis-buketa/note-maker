@@ -30,8 +30,15 @@
 package com.raywenderlich.android.notemaker.data.repository
 
 import com.raywenderlich.android.notemaker.data.model.Note
+import com.raywenderlich.android.notemaker.data.model.Tag
+import io.reactivex.Completable
+import io.reactivex.Single
 
 interface Repository {
 
-    fun insertNote(note: Note)
+  fun insertNote(note: Note): Completable
+
+  fun fetchTagId(tag: String): Single<Long>
+
+  fun addTag(tag: Tag): Single<Long>
 }

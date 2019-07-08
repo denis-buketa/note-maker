@@ -35,10 +35,11 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Note(
-    @ColumnInfo(name = "title") val title: String?,
-    @ColumnInfo(name = "content") val content: String?,
-    @ColumnInfo(name = "tag_id") val tag: Int
+  @ColumnInfo(name = "title") val title: String?,
+  @ColumnInfo(name = "content") val content: String?,
+  @ColumnInfo(name = "tag_id") val tag: Long
 ) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+
+  @PrimaryKey(autoGenerate = true)
+  var id: Long = 0
 }

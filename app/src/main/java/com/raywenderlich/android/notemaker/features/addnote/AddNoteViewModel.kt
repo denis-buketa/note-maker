@@ -30,20 +30,63 @@
 package com.raywenderlich.android.notemaker.features.addnote
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.MutableLiveData
+import androidx.room.EmptyResultSetException
 import com.raywenderlich.android.notemaker.NoteMakerApplication
 import com.raywenderlich.android.notemaker.data.model.Note
+import com.raywenderlich.android.notemaker.data.model.Tag
 import com.raywenderlich.android.notemaker.data.repository.Repository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 class AddNoteViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: Repository =
-        (application as NoteMakerApplication).dependencyInjector.repository
+  companion object {
 
-    fun saveNote(note: Note) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insertNote(note)
-    }
+    val CLOSE_SCREEN_EVENT = Object()
+  }
+
+  val closeScreenEvent = MutableLiveData<Any>()
+
+  private val compositeDisposable = CompositeDisposable()
+
+  private val repository: Repository =
+    (application as NoteMakerApplication).dependencyInjector.repository
+
+  fun onSaveNoteClicked(title: String, note: String, tag: String) =
+    compositeDisposable.add(
+      getTagId(tag)
+        .flatMapCompletable { tagId -> repository.insertNote(Note(title, note, tagId)) }
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(
+          {
+            Log.d("debug_log", "Note saved")
+            closeScreenEvent.value = CLOSE_SCREEN_EVENT
+          },
+          { Log.d("debug_log", "Throwable: $it") })
+    )
+
+  /**
+   * Get Tag id of the existing tag or create a new tag and return new id
+   */
+  private fun getTagId(tagName: String): Single<Long> =
+    repository
+      .fetchTagId(tagName)
+      .onErrorResumeNext {
+        if (it is EmptyResultSetException) {
+          repository.addTag(Tag(tagName))
+        } else {
+          throw it
+        }
+      }
+
+  override fun onCleared() {
+    compositeDisposable.clear()
+    super.onCleared()
+  }
 }

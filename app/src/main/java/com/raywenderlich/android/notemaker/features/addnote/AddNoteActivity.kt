@@ -35,48 +35,50 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.raywenderlich.android.notemaker.R
-import com.raywenderlich.android.notemaker.data.model.Note
 import kotlinx.android.synthetic.main.activity_add_note.*
 
 class AddNoteActivity : AppCompatActivity() {
 
-    companion object {
+  companion object {
 
-        fun newIntent(context: Context) = Intent(context, AddNoteActivity::class.java)
+    fun newIntent(context: Context) = Intent(context, AddNoteActivity::class.java)
+  }
+
+  private lateinit var viewModel: AddNoteViewModel
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_add_note)
+
+    supportActionBar?.title = "Add Note"
+
+    viewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
+
+    viewModel.closeScreenEvent.observe(this, Observer<Any> { finish() })
+  }
+
+  override fun onCreateOptionsMenu(menu: Menu): Boolean {
+    menuInflater.inflate(R.menu.menu_add_note, menu)
+    return super.onCreateOptionsMenu(menu)
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+
+    R.id.action_save_changes -> {
+      val title = titleEditText.text.toString()
+      val note = noteEditText.text.toString()
+      val tag = tagEditText.text.toString()
+      viewModel.onSaveNoteClicked(title, note, tag)
+      true
     }
 
-    private lateinit var viewModel: AddNoteViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_note)
-
-        supportActionBar?.title = "Add Note"
-
-        viewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
+    else -> {
+      // If we got here, the user's action was not recognized.
+      // Invoke the superclass to handle it.
+      super.onOptionsItemSelected(item)
     }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_add_note, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        R.id.action_save_changes -> {
-            val title = titleEditText.text.toString()
-            val note = noteEditText.text.toString()
-            viewModel.saveNote(Note(title, note, -1))
-            finish()
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
+  }
 }
