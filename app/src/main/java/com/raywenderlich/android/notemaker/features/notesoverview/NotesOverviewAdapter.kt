@@ -27,58 +27,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.features.addnote
+package com.raywenderlich.android.notemaker.features.notesoverview
 
-import android.content.Context
-import android.content.Intent
-import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.android.notemaker.R
-import kotlinx.android.synthetic.main.activity_add_note.*
+import com.raywenderlich.android.notemaker.data.model.Note
+import kotlinx.android.synthetic.main.view_note.view.*
 
-class AddNoteActivity : AppCompatActivity() {
+class NotesOverviewAdapter(
+    private val layoutInflater: LayoutInflater
+) : RecyclerView.Adapter<NotesOverviewAdapter.NoteViewHolder>() {
 
-  companion object {
+  interface OnNoteClickListener {
 
-    fun newIntent(context: Context) = Intent(context, AddNoteActivity::class.java)
+    fun onNoteClicked(noteId: Long)
   }
 
-  private lateinit var viewModel: AddNoteViewModel
+  private val notes = mutableListOf<Note>()
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_add_note)
+  private var clickListener: OnNoteClickListener? = null
 
-    supportActionBar?.title = "Add Note"
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder =
+      NoteViewHolder(layoutInflater.inflate(R.layout.view_note, parent, false))
 
-    viewModel = ViewModelProviders.of(this).get(AddNoteViewModel::class.java)
+  override fun getItemCount(): Int = notes.size
 
-    viewModel.closeScreenEvent.observe(this, Observer<Any> { finish() })
+  override fun onBindViewHolder(holder: NoteViewHolder, position: Int) =
+      holder.bindData(notes[position])
+
+  fun setData(newNotes: List<Note>) {
+    notes.clear()
+    notes.addAll(newNotes)
+    notifyDataSetChanged()
   }
 
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.menu_add_note, menu)
-    return super.onCreateOptionsMenu(menu)
+  fun setOnNoteClickListener(listener: OnNoteClickListener) {
+    clickListener = listener
   }
 
-  override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+  inner class NoteViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
-    R.id.action_save_changes -> {
-      val title = titleEditText.text.toString()
-      val note = noteEditText.text.toString()
-      val tag = tagEditText.text.toString()
-      viewModel.onSaveNoteClicked(title, note, tag)
-      true
-    }
-
-    else -> {
-      // If we got here, the user's action was not recognized.
-      // Invoke the superclass to handle it.
-      super.onOptionsItemSelected(item)
+    fun bindData(note: Note) {
+      view.title.text = note.title
+      view.note.text = note.content
+      view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
     }
   }
 }

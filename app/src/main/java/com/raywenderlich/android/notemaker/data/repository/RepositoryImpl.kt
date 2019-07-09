@@ -33,15 +33,25 @@ import com.raywenderlich.android.notemaker.data.database.NoteDao
 import com.raywenderlich.android.notemaker.data.database.TagDao
 import com.raywenderlich.android.notemaker.data.model.Note
 import com.raywenderlich.android.notemaker.data.model.Tag
+import io.reactivex.Completable
+import io.reactivex.Single
 
 class RepositoryImpl(
-  private val noteDao: NoteDao,
-  private val tagDao: TagDao
+    private val noteDao: NoteDao,
+    private val tagDao: TagDao
 ) : Repository {
 
   override fun insertNote(note: Note) = noteDao.insertAll(note)
 
+  override fun deleteNote(noteId: Long): Completable = noteDao.delete(noteId)
+
+  override fun fetchNotes(): Single<List<Note>> = noteDao.getAll()
+
+  override fun fetchNote(noteId: Long): Single<Note> = noteDao.getNoteById(noteId)
+
   override fun fetchTagId(tag: String) = tagDao.findIdByTag(tag)
+
+  override fun fetchTag(tagId: Long): Single<Tag> = tagDao.findById(tagId)
 
   override fun addTag(tag: Tag) = tagDao.insert(tag)
 }

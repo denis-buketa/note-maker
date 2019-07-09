@@ -72,8 +72,8 @@ class SplashActivity : AppCompatActivity() {
 
     // Make Fullscreen
     window.setFlags(
-      WindowManager.LayoutParams.FLAG_FULLSCREEN,
-      WindowManager.LayoutParams.FLAG_FULLSCREEN
+        WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        WindowManager.LayoutParams.FLAG_FULLSCREEN
     )
 
     // Hide the toolbar

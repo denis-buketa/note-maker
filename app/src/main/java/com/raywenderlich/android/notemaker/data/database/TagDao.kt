@@ -44,10 +44,10 @@ interface TagDao {
   fun getAll(): Single<List<Tag>>
 
   @Query("SELECT * FROM tag WHERE id IN (:tagIds)")
-  fun loadAllByIds(tagIds: IntArray): Single<List<Tag>>
+  fun loadAllByIds(tagIds: LongArray): Single<List<Tag>>
 
   @Query("SELECT * FROM tag WHERE id LIKE :id")
-  fun findById(id: Int): Single<Tag>
+  fun findById(id: Long): Single<Tag>
 
   @Query("SELECT id FROM tag WHERE title LIKE :tag")
   fun findIdByTag(tag: String): Single<Long>

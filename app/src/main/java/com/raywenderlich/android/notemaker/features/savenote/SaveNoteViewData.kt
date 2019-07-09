@@ -27,16 +27,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.data.model
+package com.raywenderlich.android.notemaker.features.savenote
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity
-data class Note(
-    @ColumnInfo(name = "title") val title: String,
-    @ColumnInfo(name = "content") val content: String,
-    @ColumnInfo(name = "tag_id") val tag: Long,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0
+data class SaveNoteViewData(
+    val title: String,
+    val tag: String,
+    val note: String
 )

@@ -31,20 +31,60 @@ package com.raywenderlich.android.notemaker.features.notesoverview
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.android.notemaker.R
-import com.raywenderlich.android.notemaker.features.addnote.AddNoteActivity
+import com.raywenderlich.android.notemaker.data.model.Note
+import com.raywenderlich.android.notemaker.features.savenote.SaveNoteActivity
 import kotlinx.android.synthetic.main.activity_notes_overview.*
 
-class NotesOverviewActivity : AppCompatActivity() {
+class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteClickListener {
+
+  private lateinit var viewModel: NotesOverviewViewModel
+  private lateinit var notesOverviewAdapter: NotesOverviewAdapter
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_notes_overview)
 
-    supportActionBar?.title = "Notes"
-
-    addNoteButton.setOnClickListener {
-      this.startActivity(AddNoteActivity.newIntent(this))
-    }
+    initToolbar()
+    initViewModel()
+    initNotesRecyclerView()
+    initAddNoteClickListener()
   }
+
+  private fun initToolbar() {
+    supportActionBar?.title = "Notes"
+  }
+
+  private fun initViewModel() {
+    viewModel = ViewModelProviders.of(this).get(NotesOverviewViewModel::class.java)
+    viewModel.notes.observe(this, Observer<List<Note>> { renderNotes(it) })
+  }
+
+  private fun initNotesRecyclerView() {
+    notesOverviewAdapter = NotesOverviewAdapter(layoutInflater)
+    notesOverviewAdapter.setOnNoteClickListener(this)
+    val layoutManager = LinearLayoutManager(this)
+    layoutManager.orientation = RecyclerView.VERTICAL
+    notes.layoutManager = layoutManager
+    notes.adapter = notesOverviewAdapter
+  }
+
+  private fun initAddNoteClickListener() {
+    addNoteButton.setOnClickListener { this.startActivity(SaveNoteActivity.newIntent(this)) }
+  }
+
+  override fun onResume() {
+    super.onResume()
+    viewModel.fetchNotes()
+  }
+
+  private fun renderNotes(notes: List<Note>) = notesOverviewAdapter.setData(notes)
+
+  override fun onNoteClicked(noteId: Long) =
+      this.startActivity(SaveNoteActivity.newIntent(this, noteId))
+
 }

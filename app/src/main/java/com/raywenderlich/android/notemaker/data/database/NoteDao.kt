@@ -29,10 +29,7 @@
  */
 package com.raywenderlich.android.notemaker.data.database
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.raywenderlich.android.notemaker.data.model.Note
 import io.reactivex.Completable
 import io.reactivex.Single
@@ -40,18 +37,30 @@ import io.reactivex.Single
 @Dao
 interface NoteDao {
 
+  // Search Operations
+
+  @Query("SELECT * FROM note WHERE id LIKE :noteId")
+  fun getNoteById(noteId: Long): Single<Note>
+
   @Query("SELECT * FROM note")
   fun getAll(): Single<List<Note>>
 
   @Query("SELECT * FROM note WHERE id IN (:noteIds)")
-  fun loadAllByIds(noteIds: IntArray): Single<List<Note>>
+  fun getAllByIds(noteIds: IntArray): Single<List<Note>>
 
   @Query("SELECT * FROM note WHERE id LIKE :id")
   fun findById(id: Int): Single<Note>
 
-  @Insert
+  // Insert Operations
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insertAll(vararg notes: Note): Completable
+
+  // Delete Operations
 
   @Delete
   fun delete(note: Note): Completable
+
+  @Query("DELETE FROM note WHERE id LIKE :noteId")
+  fun delete(noteId: Long): Completable
 }

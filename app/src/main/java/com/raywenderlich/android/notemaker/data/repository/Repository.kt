@@ -38,7 +38,15 @@ interface Repository {
 
   fun insertNote(note: Note): Completable
 
+  fun deleteNote(noteId: Long): Completable
+
+  fun fetchNotes(): Single<List<Note>>
+
+  fun fetchNote(noteId: Long): Single<Note>
+
   fun fetchTagId(tag: String): Single<Long>
+
+  fun fetchTag(tagId: Long): Single<Tag>
 
   fun addTag(tag: Tag): Single<Long>
 }

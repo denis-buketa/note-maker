@@ -27,63 +27,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.features.addnote
+package com.raywenderlich.android.notemaker.features.notesoverview
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.room.EmptyResultSetException
 import com.raywenderlich.android.notemaker.NoteMakerApplication
 import com.raywenderlich.android.notemaker.data.model.Note
-import com.raywenderlich.android.notemaker.data.model.Tag
-import com.raywenderlich.android.notemaker.data.repository.Repository
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-class AddNoteViewModel(application: Application) : AndroidViewModel(application) {
+class NotesOverviewViewModel(application: Application) : AndroidViewModel(application) {
 
-  companion object {
-
-    val CLOSE_SCREEN_EVENT = Object()
-  }
-
-  val closeScreenEvent = MutableLiveData<Any>()
+  val notes = MutableLiveData<List<Note>>()
 
   private val compositeDisposable = CompositeDisposable()
+  private val repository = (application as NoteMakerApplication).dependencyInjector.repository
 
-  private val repository: Repository =
-    (application as NoteMakerApplication).dependencyInjector.repository
-
-  fun onSaveNoteClicked(title: String, note: String, tag: String) =
+  fun fetchNotes() {
     compositeDisposable.add(
-      getTagId(tag)
-        .flatMapCompletable { tagId -> repository.insertNote(Note(title, note, tagId)) }
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(
-          {
-            Log.d("debug_log", "Note saved")
-            closeScreenEvent.value = CLOSE_SCREEN_EVENT
-          },
-          { Log.d("debug_log", "Throwable: $it") })
+        repository
+            .fetchNotes()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { notes.value = it },
+                { Log.e("debug_log", "Error while fetching notes: $it") }
+            )
     )
-
-  /**
-   * Get Tag id of the existing tag or create a new tag and return new id
-   */
-  private fun getTagId(tagName: String): Single<Long> =
-    repository
-      .fetchTagId(tagName)
-      .onErrorResumeNext {
-        if (it is EmptyResultSetException) {
-          repository.addTag(Tag(tagName))
-        } else {
-          throw it
-        }
-      }
+  }
 
   override fun onCleared() {
     compositeDisposable.clear()

@@ -29,7 +29,7 @@
 
     <!-- Add Note Activity -->
     <activity
-        android:name=".features.addnote.AddNoteActivity"
+        android:name=".features.savenote.SaveNoteActivity"
         android:screenOrientation="portrait"/>
   </application>
 
