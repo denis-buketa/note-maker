@@ -27,56 +27,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker
+package com.raywenderlich.android.notemaker.features.notesoverview
 
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.view.Window
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
-import com.raywenderlich.android.notemaker.features.notesoverview.NotesOverviewActivity
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import com.raywenderlich.android.notemaker.NoteMakerApplication
+import com.raywenderlich.android.notemaker.data.model.Note
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
-/**
- * Splash Screen with the app icon and name at the center, this is also the launch screen and
- * opens up in fullscreen mode. Once launched it waits for 2 seconds after which it opens the
- * NotesOverviewActivity
- */
-class SplashActivity : AppCompatActivity() {
+class NotesOverviewViewModel(application: Application) : AndroidViewModel(application) {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  val notes = MutableLiveData<List<Note>>()
 
-    makeFullScreen()
+  private val compositeDisposable = CompositeDisposable()
+  private val repository = (application as NoteMakerApplication).dependencyInjector.repository
 
-    setContentView(R.layout.activity_splash)
-
-    // Using a handler to delay loading the NotesOverviewActivity
-    Handler().postDelayed({
-
-      // Start activity
-      startActivity(Intent(this, NotesOverviewActivity::class.java))
-
-      // Animate the loading of new activity
-      overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-      // Close this activity
-      finish()
-
-    }, 2000)
+  fun fetchNotes() {
+    compositeDisposable.add(
+        repository
+            .fetchNotes()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { notes.value = it },
+                { Log.e("debug_log", "Error while fetching notes: $it") }
+            )
+    )
   }
 
-  private fun makeFullScreen() {
-    // Remove Title
-    requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-    // Make Fullscreen
-    window.setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    )
-
-    // Hide the toolbar
-    supportActionBar?.hide()
+  override fun onCleared() {
+    compositeDisposable.clear()
+    super.onCleared()
   }
 }

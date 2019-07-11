@@ -27,56 +27,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker
+package com.raywenderlich.android.notemaker.features.notesoverview
 
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.view.Window
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
-import com.raywenderlich.android.notemaker.features.notesoverview.NotesOverviewActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.raywenderlich.android.notemaker.R
+import com.raywenderlich.android.notemaker.data.model.Note
+import kotlinx.android.synthetic.main.view_note.view.*
 
-/**
- * Splash Screen with the app icon and name at the center, this is also the launch screen and
- * opens up in fullscreen mode. Once launched it waits for 2 seconds after which it opens the
- * NotesOverviewActivity
- */
-class SplashActivity : AppCompatActivity() {
+class NotesOverviewAdapter(
+    private val layoutInflater: LayoutInflater
+) : RecyclerView.Adapter<NotesOverviewAdapter.NoteViewHolder>() {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  interface OnNoteClickListener {
 
-    makeFullScreen()
-
-    setContentView(R.layout.activity_splash)
-
-    // Using a handler to delay loading the NotesOverviewActivity
-    Handler().postDelayed({
-
-      // Start activity
-      startActivity(Intent(this, NotesOverviewActivity::class.java))
-
-      // Animate the loading of new activity
-      overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-      // Close this activity
-      finish()
-
-    }, 2000)
+    fun onNoteClicked(noteId: Long)
   }
 
-  private fun makeFullScreen() {
-    // Remove Title
-    requestWindowFeature(Window.FEATURE_NO_TITLE)
+  private val notes = mutableListOf<Note>()
 
-    // Make Fullscreen
-    window.setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    )
+  private var clickListener: OnNoteClickListener? = null
 
-    // Hide the toolbar
-    supportActionBar?.hide()
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder =
+      NoteViewHolder(layoutInflater.inflate(R.layout.view_note, parent, false))
+
+  override fun getItemCount(): Int = notes.size
+
+  override fun onBindViewHolder(holder: NoteViewHolder, position: Int) =
+      holder.bindData(notes[position])
+
+  fun setData(newNotes: List<Note>) {
+    notes.clear()
+    notes.addAll(newNotes)
+    notifyDataSetChanged()
+  }
+
+  fun setOnNoteClickListener(listener: OnNoteClickListener) {
+    clickListener = listener
+  }
+
+  inner class NoteViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+
+    fun bindData(note: Note) {
+      view.title.text = note.title
+      view.note.text = note.content
+      view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
+    }
   }
 }

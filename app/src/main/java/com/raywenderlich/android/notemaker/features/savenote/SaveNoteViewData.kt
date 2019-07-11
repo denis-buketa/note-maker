@@ -27,56 +27,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker
+package com.raywenderlich.android.notemaker.features.savenote
 
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.view.Window
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
-import com.raywenderlich.android.notemaker.features.notesoverview.NotesOverviewActivity
-
-/**
- * Splash Screen with the app icon and name at the center, this is also the launch screen and
- * opens up in fullscreen mode. Once launched it waits for 2 seconds after which it opens the
- * NotesOverviewActivity
- */
-class SplashActivity : AppCompatActivity() {
-
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
-
-    makeFullScreen()
-
-    setContentView(R.layout.activity_splash)
-
-    // Using a handler to delay loading the NotesOverviewActivity
-    Handler().postDelayed({
-
-      // Start activity
-      startActivity(Intent(this, NotesOverviewActivity::class.java))
-
-      // Animate the loading of new activity
-      overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
-
-      // Close this activity
-      finish()
-
-    }, 2000)
-  }
-
-  private fun makeFullScreen() {
-    // Remove Title
-    requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-    // Make Fullscreen
-    window.setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    )
-
-    // Hide the toolbar
-    supportActionBar?.hide()
-  }
-}
+data class SaveNoteViewData(
+    val title: String,
+    val tag: String,
+    val note: String
+)

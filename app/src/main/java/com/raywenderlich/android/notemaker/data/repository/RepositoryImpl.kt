@@ -27,56 +27,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker
+package com.raywenderlich.android.notemaker.data.repository
 
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.view.Window
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
-import com.raywenderlich.android.notemaker.features.notesoverview.NotesOverviewActivity
+import com.raywenderlich.android.notemaker.data.database.NoteDao
+import com.raywenderlich.android.notemaker.data.database.TagDao
+import com.raywenderlich.android.notemaker.data.model.Note
+import com.raywenderlich.android.notemaker.data.model.Tag
+import io.reactivex.Completable
+import io.reactivex.Single
 
-/**
- * Splash Screen with the app icon and name at the center, this is also the launch screen and
- * opens up in fullscreen mode. Once launched it waits for 2 seconds after which it opens the
- * NotesOverviewActivity
- */
-class SplashActivity : AppCompatActivity() {
+class RepositoryImpl(
+    private val noteDao: NoteDao,
+    private val tagDao: TagDao
+) : Repository {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  override fun insertNote(note: Note) = noteDao.insertAll(note)
 
-    makeFullScreen()
+  override fun deleteNote(noteId: Long): Completable = noteDao.delete(noteId)
 
-    setContentView(R.layout.activity_splash)
+  override fun fetchNotes(): Single<List<Note>> = noteDao.getAll()
 
-    // Using a handler to delay loading the NotesOverviewActivity
-    Handler().postDelayed({
+  override fun fetchNote(noteId: Long): Single<Note> = noteDao.getNoteById(noteId)
 
-      // Start activity
-      startActivity(Intent(this, NotesOverviewActivity::class.java))
+  override fun fetchTagId(tag: String) = tagDao.findIdByTag(tag)
 
-      // Animate the loading of new activity
-      overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+  override fun fetchTag(tagId: Long): Single<Tag> = tagDao.findById(tagId)
 
-      // Close this activity
-      finish()
-
-    }, 2000)
-  }
-
-  private fun makeFullScreen() {
-    // Remove Title
-    requestWindowFeature(Window.FEATURE_NO_TITLE)
-
-    // Make Fullscreen
-    window.setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    )
-
-    // Hide the toolbar
-    supportActionBar?.hide()
-  }
+  override fun addTag(tag: Tag) = tagDao.insert(tag)
 }

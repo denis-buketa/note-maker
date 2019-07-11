@@ -27,56 +27,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker
+package com.raywenderlich.android.notemaker.data.database
 
-import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
-import android.view.Window
-import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
-import com.raywenderlich.android.notemaker.features.notesoverview.NotesOverviewActivity
+import androidx.room.*
+import com.raywenderlich.android.notemaker.data.model.Note
+import io.reactivex.Completable
+import io.reactivex.Single
 
-/**
- * Splash Screen with the app icon and name at the center, this is also the launch screen and
- * opens up in fullscreen mode. Once launched it waits for 2 seconds after which it opens the
- * NotesOverviewActivity
- */
-class SplashActivity : AppCompatActivity() {
+@Dao
+interface NoteDao {
 
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+  // Search Operations
 
-    makeFullScreen()
+  @Query("SELECT * FROM note WHERE id LIKE :noteId")
+  fun getNoteById(noteId: Long): Single<Note>
 
-    setContentView(R.layout.activity_splash)
+  @Query("SELECT * FROM note")
+  fun getAll(): Single<List<Note>>
 
-    // Using a handler to delay loading the NotesOverviewActivity
-    Handler().postDelayed({
+  @Query("SELECT * FROM note WHERE id IN (:noteIds)")
+  fun getAllByIds(noteIds: IntArray): Single<List<Note>>
 
-      // Start activity
-      startActivity(Intent(this, NotesOverviewActivity::class.java))
+  @Query("SELECT * FROM note WHERE id LIKE :id")
+  fun findById(id: Int): Single<Note>
 
-      // Animate the loading of new activity
-      overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+  // Insert Operations
 
-      // Close this activity
-      finish()
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  fun insertAll(vararg notes: Note): Completable
 
-    }, 2000)
-  }
+  // Delete Operations
 
-  private fun makeFullScreen() {
-    // Remove Title
-    requestWindowFeature(Window.FEATURE_NO_TITLE)
+  @Delete
+  fun delete(note: Note): Completable
 
-    // Make Fullscreen
-    window.setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    )
-
-    // Hide the toolbar
-    supportActionBar?.hide()
-  }
+  @Query("DELETE FROM note WHERE id LIKE :noteId")
+  fun delete(noteId: Long): Completable
 }
