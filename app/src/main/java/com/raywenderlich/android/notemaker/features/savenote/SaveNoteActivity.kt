@@ -37,11 +37,16 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.raywenderlich.android.notemaker.R
+import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.features.savenote.SaveNoteViewModel.Companion.INVALID_NOTE_ID
+import com.raywenderlich.android.notemaker.features.savenote.colorpicker.ColorItemDecoration
+import com.raywenderlich.android.notemaker.features.savenote.colorpicker.ColorsAdapter
 import kotlinx.android.synthetic.main.activity_add_note.*
+import kotlinx.android.synthetic.main.bottom_sheet_more.*
 
-class SaveNoteActivity : AppCompatActivity() {
+class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener {
 
   companion object {
 
@@ -58,7 +63,15 @@ class SaveNoteActivity : AppCompatActivity() {
         }
   }
 
+  private val colorItemInnerMargin by lazy {
+    resources.getDimensionPixelSize(R.dimen.color_item_inner_margin)
+  }
+  private val colorItemOuterMargin by lazy {
+    resources.getDimensionPixelSize(R.dimen.color_item_outer_margin)
+  }
+
   private lateinit var viewModel: SaveNoteViewModel
+  private lateinit var colorsAdapter: ColorsAdapter
   private var noteId: Long = INVALID_NOTE_ID
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +80,8 @@ class SaveNoteActivity : AppCompatActivity() {
 
     extractArguments()
     initToolbar()
+    initColors()
+    initOnDeleteClickListener()
     initViewModel()
   }
 
@@ -78,25 +93,51 @@ class SaveNoteActivity : AppCompatActivity() {
     supportActionBar?.title = if (noteId == INVALID_NOTE_ID) "Add Note" else "Edit Note"
   }
 
+  private fun initOnDeleteClickListener() {
+    deleteNoteOption.setOnClickListener { viewModel.deleteNote() }
+  }
+
+  private fun initColors() {
+
+    colorsAdapter = ColorsAdapter(layoutInflater)
+    colorsAdapter.setOnColorClickListener(this)
+
+    val linearLayoutManager = LinearLayoutManager(this)
+    linearLayoutManager.orientation = LinearLayoutManager.HORIZONTAL
+
+    colors.layoutManager = linearLayoutManager
+    colors.addItemDecoration(ColorItemDecoration(colorItemOuterMargin, colorItemInnerMargin))
+    colors.adapter = colorsAdapter
+  }
+
   private fun initViewModel() {
     viewModel = ViewModelProviders.of(this).get(SaveNoteViewModel::class.java)
     viewModel.closeScreenEvent.observe(this, Observer<Any> { finish() })
     viewModel.viewData.observe(this, Observer { renderViewData(it) })
+    viewModel.colors.observe(this, Observer { renderColors(it) })
 
-    if (noteId != INVALID_NOTE_ID) {
-      viewModel.fetchNote(noteId)
-    }
+    viewModel.fetchViewData(noteId)
+    viewModel.fetchColors()
   }
 
   private fun renderViewData(viewData: SaveNoteViewData) = with(viewData) {
     titleEditText.setText(title)
-    tagEditText.setText(tag)
     noteEditText.setText(note)
+    noteContainer.setBackgroundColor(android.graphics.Color.parseColor(viewData.noteColor.hex))
+  }
+
+  private fun renderColors(colors: List<Color>) {
+    colorsAdapter.setData(colors)
+  }
+
+  override fun onColorClicked(color: Color) {
+    val title = titleEditText.text.toString()
+    val note = noteEditText.text.toString()
+    viewModel.colorNote(title, note, color)
   }
 
   override fun onCreateOptionsMenu(menu: Menu): Boolean {
     menuInflater.inflate(R.menu.menu_add_note, menu)
-    menu.findItem(R.id.action_delete_note).isVisible = noteId != INVALID_NOTE_ID
     return super.onCreateOptionsMenu(menu)
   }
 
@@ -105,13 +146,7 @@ class SaveNoteActivity : AppCompatActivity() {
     R.id.action_save_changes -> {
       val title = titleEditText.text.toString()
       val note = noteEditText.text.toString()
-      val tag = tagEditText.text.toString()
-      viewModel.saveNote(title, note, tag)
-      true
-    }
-
-    R.id.action_delete_note -> {
-      viewModel.deleteNote(noteId)
+      viewModel.saveNote(title, note)
       true
     }
 

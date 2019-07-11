@@ -27,28 +27,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.data.repository
+package com.raywenderlich.android.notemaker.features.savenote.colorpicker
 
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
+import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.data.model.Color
-import com.raywenderlich.android.notemaker.data.model.Note
-import io.reactivex.Completable
-import io.reactivex.Single
+import kotlinx.android.synthetic.main.view_color.view.*
 
-interface Repository {
+class ColorsAdapter(
+    private val layoutInflater: LayoutInflater
+) : RecyclerView.Adapter<ColorsAdapter.ColorViewHolder>() {
 
-  // notes
+  interface OnColorClickListener {
 
-  fun getAllNotes(): Single<List<Note>>
+    fun onColorClicked(color: Color)
+  }
 
-  fun findNoteById(id: Long): Single<Note>
+  private val colors = mutableListOf<Color>()
 
-  fun insertNote(note: Note): Completable
+  private var colorClickListener: OnColorClickListener? = null
 
-  fun deleteNote(id: Long): Completable
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder =
+      ColorViewHolder(layoutInflater.inflate(R.layout.view_color, parent, false))
 
-  // colors
+  override fun getItemCount(): Int = colors.size
 
-  fun getAllColors(): Single<List<Color>>
+  override fun onBindViewHolder(holder: ColorViewHolder, position: Int) =
+      holder.bindData(colors[position])
 
-  fun findColorById(id: Long): Single<Color>
+  fun setData(newColors: List<Color>) {
+    colors.clear()
+    colors.addAll(newColors)
+    notifyDataSetChanged()
+  }
+
+  fun setOnColorClickListener(listener: OnColorClickListener) {
+    colorClickListener = listener
+  }
+
+  inner class ColorViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+
+    fun bindData(color: Color) {
+      view.colorView.setBackgroundColor(android.graphics.Color.parseColor(color.hex))
+      view.setOnClickListener { colorClickListener?.onColorClicked(color) }
+    }
+  }
 }

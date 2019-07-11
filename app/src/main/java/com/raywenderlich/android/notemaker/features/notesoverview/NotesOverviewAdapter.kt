@@ -29,12 +29,12 @@
  */
 package com.raywenderlich.android.notemaker.features.notesoverview
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.android.notemaker.R
-import com.raywenderlich.android.notemaker.data.model.Note
 import kotlinx.android.synthetic.main.view_note.view.*
 
 class NotesOverviewAdapter(
@@ -46,7 +46,7 @@ class NotesOverviewAdapter(
     fun onNoteClicked(noteId: Long)
   }
 
-  private val notes = mutableListOf<Note>()
+  private val notes = mutableListOf<NoteOverviewItemData>()
 
   private var clickListener: OnNoteClickListener? = null
 
@@ -58,7 +58,7 @@ class NotesOverviewAdapter(
   override fun onBindViewHolder(holder: NoteViewHolder, position: Int) =
       holder.bindData(notes[position])
 
-  fun setData(newNotes: List<Note>) {
+  fun setData(newNotes: List<NoteOverviewItemData>) {
     notes.clear()
     notes.addAll(newNotes)
     notifyDataSetChanged()
@@ -70,10 +70,13 @@ class NotesOverviewAdapter(
 
   inner class NoteViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
-    fun bindData(note: Note) {
-      view.title.text = note.title
-      view.note.text = note.content
-      view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
+    fun bindData(item: NoteOverviewItemData) {
+      with(item) {
+        view.title.text = note.title
+        view.note.text = note.content
+        view.root.setBackgroundColor(Color.parseColor(color.hex))
+        view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
+      }
     }
   }
 }

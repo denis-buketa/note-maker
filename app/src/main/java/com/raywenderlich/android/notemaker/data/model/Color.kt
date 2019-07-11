@@ -34,8 +34,30 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Tag(@ColumnInfo(name = "title") val title: String?) {
+data class Color(
+    @ColumnInfo(name = "hex") val hex: String?,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0
+) {
 
-  @PrimaryKey(autoGenerate = true)
-  var id: Long = 0
+  companion object {
+
+    val DEFAULT_COLOR = Color("#FFFFFF", 1)
+
+    val DEFAULT_COLORS = listOf(
+        Color("#FFFFFF", 1), // White
+        Color("#E57373", 2), // Red
+        Color("#F06292", 3), // Pink
+        Color("#CE93D8", 4), // Purple
+        Color("#2196F3", 5), // Blue
+        Color("#00ACC1", 6), // Cyan
+        Color("#26A69A", 7), // Teal
+        Color("#4CAF50", 8), // Green
+        Color("#8BC34A", 9), // Light Green
+        Color("#CDDC39", 10), // Lime
+        Color("#FFEB3B", 11), // Yellow
+        Color("#FF9800", 12), // Orange
+        Color("#BCAAA4", 13), // Brown
+        Color("#9E9E9E", 14)  // Gray
+    )
+  }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <dimen name="input_title_padding">8dp</dimen>
+  <dimen name="input_title_text_size">24sp</dimen>
+
+  <dimen name="input_note_padding">8dp</dimen>
+  <dimen name="input_note_text_size">16sp</dimen>
+
+  <dimen name="color_item_vertical_margin">8dp</dimen>
+  <dimen name="color_item_outer_margin">8dp</dimen>
+  <dimen name="color_item_inner_margin">4dp</dimen>
+  <dimen name="color_item_size">32dp</dimen>
+
+</resources>

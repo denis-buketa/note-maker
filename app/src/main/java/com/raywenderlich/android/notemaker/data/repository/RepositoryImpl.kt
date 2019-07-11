@@ -29,29 +29,54 @@
  */
 package com.raywenderlich.android.notemaker.data.repository
 
+import android.annotation.SuppressLint
+import android.util.Log
+import com.raywenderlich.android.notemaker.data.database.ColorDao
 import com.raywenderlich.android.notemaker.data.database.NoteDao
-import com.raywenderlich.android.notemaker.data.database.TagDao
+import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.data.model.Note
-import com.raywenderlich.android.notemaker.data.model.Tag
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
 
 class RepositoryImpl(
     private val noteDao: NoteDao,
-    private val tagDao: TagDao
+    private val colorDao: ColorDao
 ) : Repository {
 
-  override fun insertNote(note: Note) = noteDao.insertAll(note)
+  init {
+    prepopulateDatabase()
+  }
 
-  override fun deleteNote(noteId: Long): Completable = noteDao.delete(noteId)
+  @SuppressLint("CheckResult")
+  private fun prepopulateDatabase() {
+    val colors = Color.DEFAULT_COLORS.toTypedArray()
+    colorDao
+        .getAll()
+        .flatMapCompletable {
+          if (it.isEmpty()) {
+            colorDao.insertAll(*colors)
+          } else {
+            Completable.complete()
+          }
+        }
+        .subscribeOn(Schedulers.io())
+        .subscribe(
+            { /* Colors inserted successfully */ },
+            { Log.e(Repository::class.java.name, "Error occurred while inserting colors") }
+        )
 
-  override fun fetchNotes(): Single<List<Note>> = noteDao.getAll()
+  }
 
-  override fun fetchNote(noteId: Long): Single<Note> = noteDao.getNoteById(noteId)
+  override fun getAllNotes(): Single<List<Note>> = noteDao.getAll()
 
-  override fun fetchTagId(tag: String) = tagDao.findIdByTag(tag)
+  override fun findNoteById(id: Long): Single<Note> = noteDao.findById(id)
 
-  override fun fetchTag(tagId: Long): Single<Tag> = tagDao.findById(tagId)
+  override fun insertNote(note: Note): Completable = noteDao.insert(note)
 
-  override fun addTag(tag: Tag) = tagDao.insert(tag)
+  override fun deleteNote(id: Long): Completable = noteDao.delete(id)
+
+  override fun getAllColors(): Single<List<Color>> = colorDao.getAll()
+
+  override fun findColorById(id: Long): Single<Color> = colorDao.findById(id)
 }
