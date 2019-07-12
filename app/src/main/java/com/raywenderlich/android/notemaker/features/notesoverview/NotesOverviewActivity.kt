@@ -36,7 +36,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.android.notemaker.R
-import com.raywenderlich.android.notemaker.data.model.Note
 import com.raywenderlich.android.notemaker.features.savenote.SaveNoteActivity
 import kotlinx.android.synthetic.main.activity_notes_overview.*
 
@@ -61,7 +60,8 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
 
   private fun initViewModel() {
     viewModel = ViewModelProviders.of(this).get(NotesOverviewViewModel::class.java)
-    viewModel.notes.observe(this, Observer<List<Note>> { renderNotes(it) })
+    viewModel.notes.observe(this,
+        Observer<List<NoteOverviewItemData>> { notesOverviewAdapter.setData(it) })
   }
 
   private fun initNotesRecyclerView() {
@@ -82,9 +82,6 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
     viewModel.fetchNotes()
   }
 
-  private fun renderNotes(notes: List<Note>) = notesOverviewAdapter.setData(notes)
-
   override fun onNoteClicked(noteId: Long) =
       this.startActivity(SaveNoteActivity.newIntent(this, noteId))
-
 }

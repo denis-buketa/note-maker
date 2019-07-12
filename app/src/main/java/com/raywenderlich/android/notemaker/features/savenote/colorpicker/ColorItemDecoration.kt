@@ -27,37 +27,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.data.database
+package com.raywenderlich.android.notemaker.features.savenote.colorpicker
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
-import com.raywenderlich.android.notemaker.data.model.Tag
-import io.reactivex.Completable
-import io.reactivex.Single
+import android.graphics.Rect
+import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 
-@Dao
-interface TagDao {
+private const val FIRST_POSITION_INDEX = 0
 
-  @Query("SELECT * FROM tag")
-  fun getAll(): Single<List<Tag>>
+class ColorItemDecoration(
+    private val outerMarginPx: Int,
+    private val innerMarginPx: Int
+) : RecyclerView.ItemDecoration() {
 
-  @Query("SELECT * FROM tag WHERE id IN (:tagIds)")
-  fun loadAllByIds(tagIds: LongArray): Single<List<Tag>>
+  override fun getItemOffsets(
+      outRect: Rect,
+      view: View,
+      parent: RecyclerView,
+      state: RecyclerView.State) {
+    val position = parent.getChildAdapterPosition(view)
+    val itemCount = parent.adapter?.itemCount
 
-  @Query("SELECT * FROM tag WHERE id LIKE :id")
-  fun findById(id: Long): Single<Tag>
-
-  @Query("SELECT id FROM tag WHERE title LIKE :tag")
-  fun findIdByTag(tag: String): Single<Long>
-
-  @Insert
-  fun insertAll(vararg tags: Tag): Completable
-
-  @Insert
-  fun insert(tag: Tag): Single<Long>
-
-  @Delete
-  fun delete(tag: Tag): Completable
+    with(outRect) {
+      left = if (position == FIRST_POSITION_INDEX) outerMarginPx else innerMarginPx
+      right = if (itemCount != null && position == itemCount - 1) outerMarginPx else innerMarginPx
+    }
+  }
 }

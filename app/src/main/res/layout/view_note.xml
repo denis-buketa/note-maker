@@ -6,11 +6,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
+    android:layout_marginEnd="@dimen/note_overview_item_margin_horizontal"
+    android:layout_marginStart="@dimen/note_overview_item_margin_horizontal"
+    android:layout_marginTop="@dimen/note_overview_item_margin_top"
+    android:background="@drawable/background_note_overview_item"
     android:clickable="true"
     android:focusable="true"
     android:orientation="vertical"
-    android:padding="8dp">
+    android:padding="@dimen/note_overview_item_padding">
 
   <TextView
       android:id="@+id/title"
@@ -21,11 +24,11 @@
       android:lines="1"
       android:maxLines="1"
       android:textColor="@color/colorBlack"
-      android:textSize="16sp"
+      android:textSize="@dimen/note_overview_item_text_size"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
-      tools:text="Palacinke"/>
+      tools:text="Title"/>
 
   <TextView
       android:id="@+id/note"
@@ -38,6 +41,6 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/title"
-      tools:text="jaja brasno mlijeko secer ..."/>
+      tools:text="Content"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

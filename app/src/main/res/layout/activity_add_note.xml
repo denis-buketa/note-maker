@@ -1,50 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-  <EditText
-      android:id="@+id/titleEditText"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:background="@android:color/transparent"
-      android:hint="Title"
-      android:lines="1"
-      android:padding="8dp"
-      android:textSize="24sp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"/>
-
-  <EditText
-      android:id="@+id/tagEditText"
-      android:layout_width="0dp"
-      android:layout_height="wrap_content"
-      android:background="@android:color/transparent"
-      android:hint="Tag"
-      android:lines="1"
-      android:padding="8dp"
-      android:textSize="16sp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/titleEditText"/>
-
-  <EditText
-      android:id="@+id/noteEditText"
+  <LinearLayout
+      android:id="@+id/noteContainer"
       android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:background="@android:color/transparent"
-      android:gravity="top"
-      android:hint="Note"
-      android:inputType="textCapSentences|textNoSuggestions|textMultiLine"
-      android:padding="8dp"
-      android:textSize="16sp"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/tagEditText"/>
+      android:layout_height="match_parent"
+      android:orientation="vertical">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:id="@+id/titleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:hint="@string/hint_title"
+        android:inputType="textCapSentences"
+        android:lines="1"
+        android:padding="@dimen/input_title_padding"
+        android:textSize="@dimen/input_title_text_size"/>
+
+    <EditText
+        android:id="@+id/noteEditText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:hint="@string/hint_note"
+        android:inputType="textCapSentences|textNoSuggestions|textMultiLine"
+        android:padding="@dimen/input_note_padding"
+        android:textSize="@dimen/input_note_text_size"/>
+
+  </LinearLayout>
+
+  <include
+      layout="@layout/bottom_sheet_more"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

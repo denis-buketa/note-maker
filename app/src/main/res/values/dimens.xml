@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- Notes Overview Screen -->
+
+  <dimen name="fab_button_size">56dp</dimen>
+  <dimen name="fab_button_margin">16dp</dimen>
+
+  <!-- Note Overview Item -->
+  
+  <dimen name="note_overview_item_margin_horizontal">8dp</dimen>
+  <dimen name="note_overview_item_margin_top">8dp</dimen>
+  <dimen name="note_overview_item_padding">8dp</dimen>
+  <dimen name="note_overview_item_text_size">16sp</dimen>
+
+  <dimen name="note_overview_item_frame_width">1dp</dimen>
+  <dimen name="note_overview_item_frame_corner_radius">8dp</dimen>
+
+  <!-- Save Note Screen -->
+
+  <dimen name="input_title_padding">8dp</dimen>
+  <dimen name="input_title_text_size">24sp</dimen>
+
+  <dimen name="input_note_padding">8dp</dimen>
+  <dimen name="input_note_text_size">16sp</dimen>
+
+  <dimen name="color_item_vertical_margin">16dp</dimen>
+  <dimen name="color_item_outer_margin">16dp</dimen>
+  <dimen name="color_item_inner_margin">8dp</dimen>
+  <dimen name="color_item_size">64dp</dimen>
+
+  <dimen name="color_item_frame_width">2dp</dimen>
+  <dimen name="color_item_frame_corner_radius">8dp</dimen>
+
+  <!-- Bottom Sheet -->
+
+  <dimen name="bottom_sheet_peek_height">32dp</dimen>
+
+  <dimen name="bottom_sheet_option_image_size">26dp</dimen>
+  <dimen name="bottom_sheet_option_image_margin">16dp</dimen>
+
+  <dimen name="bottom_sheet_option_text_margin_start">16dp</dimen>
+  <dimen name="bottom_sheet_option_text_size">18sp</dimen>
+
+  <dimen name="bottom_sheet_corner_radius">8dp</dimen>
+
+</resources>

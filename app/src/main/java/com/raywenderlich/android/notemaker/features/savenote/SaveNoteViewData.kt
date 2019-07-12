@@ -29,8 +29,16 @@
  */
 package com.raywenderlich.android.notemaker.features.savenote
 
+import com.raywenderlich.android.notemaker.data.model.Color
+
 data class SaveNoteViewData(
     val title: String,
-    val tag: String,
-    val note: String
-)
+    val note: String,
+    val noteColor: Color
+) {
+
+  companion object {
+
+    val DEFAULT = SaveNoteViewData("", "", Color.DEFAULT_COLOR)
+  }
+}

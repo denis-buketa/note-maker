@@ -37,6 +37,12 @@ import androidx.room.PrimaryKey
 data class Note(
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "content") val content: String,
-    @ColumnInfo(name = "tag_id") val tag: Long,
+    @ColumnInfo(name = "color_id") val colorId: Long = 0,
     @PrimaryKey(autoGenerate = true) val id: Long = 0
-)
+) {
+
+  companion object {
+
+    val EMPTY = Note("", "", 0, 0)
+  }
+}

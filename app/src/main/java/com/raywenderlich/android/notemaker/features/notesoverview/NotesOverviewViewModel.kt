@@ -34,14 +34,15 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.raywenderlich.android.notemaker.NoteMakerApplication
-import com.raywenderlich.android.notemaker.data.model.Note
+import com.raywenderlich.android.notemaker.data.model.Color
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
 class NotesOverviewViewModel(application: Application) : AndroidViewModel(application) {
 
-  val notes = MutableLiveData<List<Note>>()
+  val notes = MutableLiveData<List<NoteOverviewItemData>>()
 
   private val compositeDisposable = CompositeDisposable()
   private val repository = (application as NoteMakerApplication).dependencyInjector.repository
@@ -49,7 +50,17 @@ class NotesOverviewViewModel(application: Application) : AndroidViewModel(applic
   fun fetchNotes() {
     compositeDisposable.add(
         repository
-            .fetchNotes()
+            .getAllNotes()
+            .flatMapObservable { Observable.fromIterable(it) }
+            .flatMapSingle { note ->
+              repository
+                  .findColorById(note.colorId)
+                  .onErrorReturn { Color.DEFAULT_COLOR }
+                  .map {
+                    NoteOverviewItemData(note, it)
+                  }
+            }
+            .toList()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(

@@ -27,28 +27,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.data.repository
+package com.raywenderlich.android.notemaker.data.database
 
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 import com.raywenderlich.android.notemaker.data.model.Color
-import com.raywenderlich.android.notemaker.data.model.Note
 import io.reactivex.Completable
 import io.reactivex.Single
 
-interface Repository {
+@Dao
+interface ColorDao {
 
-  // notes
+  @Query("SELECT * FROM Color")
+  fun getAll(): Single<List<Color>>
 
-  fun getAllNotes(): Single<List<Note>>
+  @Query("SELECT * FROM Color WHERE id LIKE :id")
+  fun findById(id: Long): Single<Color>
 
-  fun findNoteById(id: Long): Single<Note>
-
-  fun insertNote(note: Note): Completable
-
-  fun deleteNote(id: Long): Completable
-
-  // colors
-
-  fun getAllColors(): Single<List<Color>>
-
-  fun findColorById(id: Long): Single<Color>
+  @Insert
+  fun insertAll(vararg colors: Color): Completable
 }

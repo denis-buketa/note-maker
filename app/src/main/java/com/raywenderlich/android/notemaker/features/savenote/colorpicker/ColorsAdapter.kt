@@ -27,9 +27,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.raywenderlich.android.notemaker.features.notesoverview
+package com.raywenderlich.android.notemaker.features.savenote.colorpicker
 
-import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
@@ -37,56 +36,53 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.android.notemaker.R
-import kotlinx.android.synthetic.main.view_note.view.*
+import com.raywenderlich.android.notemaker.data.model.Color
+import kotlinx.android.synthetic.main.view_color.view.*
 
-class NotesOverviewAdapter(
+class ColorsAdapter(
     private val layoutInflater: LayoutInflater
-) : RecyclerView.Adapter<NotesOverviewAdapter.NoteViewHolder>() {
+) : RecyclerView.Adapter<ColorsAdapter.ColorViewHolder>() {
 
-  interface OnNoteClickListener {
+  interface OnColorClickListener {
 
-    fun onNoteClicked(noteId: Long)
+    fun onColorClicked(color: Color)
   }
 
-  private val notes = mutableListOf<NoteOverviewItemData>()
+  private val colors = mutableListOf<Color>()
 
-  private var clickListener: OnNoteClickListener? = null
+  private var colorClickListener: OnColorClickListener? = null
 
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder =
-      NoteViewHolder(layoutInflater.inflate(R.layout.view_note, parent, false))
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorViewHolder =
+      ColorViewHolder(layoutInflater.inflate(R.layout.view_color, parent, false))
 
-  override fun getItemCount(): Int = notes.size
+  override fun getItemCount(): Int = colors.size
 
-  override fun onBindViewHolder(holder: NoteViewHolder, position: Int) =
-      holder.bindData(notes[position])
+  override fun onBindViewHolder(holder: ColorViewHolder, position: Int) =
+      holder.bindData(colors[position])
 
-  fun setData(newNotes: List<NoteOverviewItemData>) {
-    notes.clear()
-    notes.addAll(newNotes)
+  fun setData(newColors: List<Color>) {
+    colors.clear()
+    colors.addAll(newColors)
     notifyDataSetChanged()
   }
 
-  fun setOnNoteClickListener(listener: OnNoteClickListener) {
-    clickListener = listener
+  fun setOnColorClickListener(listener: OnColorClickListener) {
+    colorClickListener = listener
   }
 
-  inner class NoteViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+  inner class ColorViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
-    fun bindData(item: NoteOverviewItemData) {
-      with(item) {
-        view.title.text = note.title
-        view.note.text = note.content
+    fun bindData(color: Color) = with(view) {
 
-        /* Setup background color */
-        val drawableBackground = view.root.background
-        drawableBackground.colorFilter = PorterDuffColorFilter(
-            Color.parseColor(color.hex),
-            PorterDuff.Mode.MULTIPLY
-        )
-        view.root.background = drawableBackground
+      /* Setup background color */
+      val drawableBackground = colorView.background
+      drawableBackground.colorFilter = PorterDuffColorFilter(
+          android.graphics.Color.parseColor(color.hex),
+          PorterDuff.Mode.MULTIPLY
+      )
+      colorView.background = drawableBackground
 
-        view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
-      }
+      setOnClickListener { colorClickListener?.onColorClicked(color) }
     }
   }
 }

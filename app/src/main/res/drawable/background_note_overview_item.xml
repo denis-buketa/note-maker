@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+       android:shape="rectangle">
+
+  <corners
+      android:radius="@dimen/note_overview_item_frame_corner_radius"/>
+
+  <stroke
+      android:width="@dimen/note_overview_item_frame_width"
+      android:color="@color/colorNoteOverviewItemFrame"/>
+
+  <solid
+      android:color="@color/colorWhite"/>
+
+</shape>

@@ -33,10 +33,9 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.room.EmptyResultSetException
 import com.raywenderlich.android.notemaker.NoteMakerApplication
+import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.data.model.Note
-import com.raywenderlich.android.notemaker.data.model.Tag
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -49,11 +48,10 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
     const val INVALID_NOTE_ID = -1L
 
     val CLOSE_SCREEN_EVENT = Object()
-
-    private const val EMPTY = ""
   }
 
   val viewData = MutableLiveData<SaveNoteViewData>()
+  val colors = MutableLiveData<List<Color>>()
   val closeScreenEvent = MutableLiveData<Any>()
 
   private val compositeDisposable = CompositeDisposable()
@@ -61,71 +59,83 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
 
   private var noteId = INVALID_NOTE_ID
 
-  fun fetchNote(noteId: Long) {
+  fun fetchViewData(noteId: Long) {
     this.noteId = noteId
+
+    if (noteId == INVALID_NOTE_ID) {
+      viewData.value = SaveNoteViewData.DEFAULT
+      return
+    }
+
     compositeDisposable.add(
-        repository
-            .fetchNote(noteId)
-            .flatMap { note -> fetchTagTitle(note.tag).map { mapToViewData(note, it) } }
+        fetchNoteRelatedData(noteId)
+            .map { mapToViewData(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { viewData.value = it },
-                { Log.e("debug_log", "Error while fetching note: $it") }
+                { Log.e("debug_log", "Error while fetching view data: $it") }
             )
     )
   }
 
-  private fun fetchTagTitle(tagId: Long) =
+  private fun fetchNoteRelatedData(noteId: Long): Single<NoteRelatedData> =
       repository
-          .fetchTag(tagId)
-          .map { it.title }
-          .onErrorReturn { EMPTY }
+          .findNoteById(noteId)
+          .flatMap { note ->
+            repository
+                .findColorById(note.colorId)
+                .map { color -> NoteRelatedData(note, color) }
+          }
 
-  private fun mapToViewData(note: Note, tagTitle: String) =
-      SaveNoteViewData(note.title, tagTitle, note.content)
+  private fun mapToViewData(noteRelatedData: NoteRelatedData): SaveNoteViewData =
+      SaveNoteViewData(
+          noteRelatedData.note.title,
+          noteRelatedData.note.content,
+          noteRelatedData.noteColor
+      )
 
-  fun saveNote(title: String, noteContent: String, tag: String) =
+  fun fetchColors() =
       compositeDisposable.add(
-          getTagId(tag)
-              .flatMapCompletable { tagId ->
-
-                val note = if (noteId == INVALID_NOTE_ID)
-                  Note(title, noteContent, tagId)
-                else
-                  Note(title, noteContent, tagId, noteId)
-
-                repository.insertNote(note)
-              }
+          repository.getAllColors()
               .subscribeOn(Schedulers.io())
               .observeOn(AndroidSchedulers.mainThread())
               .subscribe(
-                  { closeScreen() },
-                  { Log.e("debug_log", "Error while saving note: $it") }
+                  { colors.value = it },
+                  { Log.e("debug_log", "Error while fetching colors: $it") }
               )
       )
 
-  /**
-   * Get Tag id of the existing tag or create a new tag and return new id
-   */
-  private fun getTagId(tagName: String): Single<Long> {
+  fun saveNote(title: String, noteContent: String) {
 
-    if (tagName.isEmpty()) {
-      return Single.just(0)
+    if (title.isEmpty()) {
+      return
     }
 
-    return repository
-        .fetchTagId(tagName)
-        .onErrorResumeNext {
-          if (it is EmptyResultSetException) {
-            repository.addTag(Tag(tagName))
-          } else {
-            throw it
-          }
-        }
+    val noteColorId = viewData.value?.noteColor?.id ?: Color.DEFAULT_COLOR.id
+
+    val note = if (noteId == INVALID_NOTE_ID)
+      Note(title, noteContent, noteColorId)
+    else
+      Note(title, noteContent, noteColorId, noteId)
+
+    compositeDisposable.add(
+        repository.insertNote(note)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(
+                { closeScreen() },
+                { Log.e("debug_log", "Error while saving note: $it") }
+            )
+    )
   }
 
-  fun deleteNote(noteId: Long) {
+  fun deleteNote() {
+
+    if (noteId == INVALID_NOTE_ID) {
+      return
+    }
+
     compositeDisposable.add(
         repository
             .deleteNote(noteId)
@@ -138,6 +148,10 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
     )
   }
 
+  fun colorNote(title: String, content: String, color: Color) {
+    viewData.value = SaveNoteViewData(title, content, color)
+  }
+
   private fun closeScreen() {
     closeScreenEvent.value = CLOSE_SCREEN_EVENT
   }
@@ -146,4 +160,9 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
     compositeDisposable.clear()
     super.onCleared()
   }
+
+  private data class NoteRelatedData(
+      val note: Note,
+      val noteColor: Color
+  )
 }
