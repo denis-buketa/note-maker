@@ -43,6 +43,9 @@ import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.features.savenote.SaveNoteActivity
 import kotlinx.android.synthetic.main.activity_notes_overview.*
 
+/**
+ * Represents "Notes" screen. This is the first screen after "Splash" screen.
+ */
 class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteClickListener {
 
   private lateinit var viewModel: NotesOverviewViewModel
@@ -52,65 +55,23 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_notes_overview)
 
+    // Request to be layout full screen
     requestToBeLayoutFullscreen()
-    handleInsets()
+
+    // Adapt view according to insets
+    adaptViewForInsets()
+
+    // Initialize toolbar with the title
     initToolbar()
+
+    // Initialize view model and start observing LiveData
     initViewModel()
+
+    // Initialize adapter and recycler view for displaying notes
     initNotesRecyclerView()
+
+    // Initialize click listener for "Add Note" button
     initAddNoteClickListener()
-  }
-
-  private fun requestToBeLayoutFullscreen() {
-    root.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
-  }
-
-  private fun handleInsets() {
-
-    val toolbarOriginalTopPadding = toolbar.paddingTop
-
-    val addNoteButtonMarginLayoutParam = addNoteButton.layoutParams as ViewGroup.MarginLayoutParams
-    val addNoteButtonOriginalBottomMargin = addNoteButtonMarginLayoutParam.bottomMargin
-
-    ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
-
-      val newToolbarTopPadding = windowInsets.systemWindowInsetTop + toolbarOriginalTopPadding
-      toolbar.setPadding(0, newToolbarTopPadding, 0, 0)
-
-      addNoteButtonMarginLayoutParam.bottomMargin =
-          addNoteButtonOriginalBottomMargin + windowInsets.systemWindowInsetBottom
-      addNoteButton.layoutParams = addNoteButtonMarginLayoutParam
-
-      windowInsets
-    }
-
-    notes.setOnApplyWindowInsetsListener { view, windowInsets ->
-      view.updatePadding(bottom = windowInsets.systemWindowInsetBottom)
-      windowInsets
-    }
-  }
-
-  private fun initToolbar() {
-    screenTitle.setText(R.string.notes_overview_screen_title)
-  }
-
-  private fun initViewModel() {
-    viewModel = ViewModelProviders.of(this).get(NotesOverviewViewModel::class.java)
-    viewModel.notes.observe(this,
-        Observer<List<NoteOverviewItemData>> { notesOverviewAdapter.setData(it) })
-  }
-
-  private fun initNotesRecyclerView() {
-    notesOverviewAdapter = NotesOverviewAdapter(layoutInflater)
-    notesOverviewAdapter.setOnNoteClickListener(this)
-    val layoutManager = LinearLayoutManager(this)
-    layoutManager.orientation = RecyclerView.VERTICAL
-    notes.layoutManager = layoutManager
-    notes.adapter = notesOverviewAdapter
-  }
-
-  private fun initAddNoteClickListener() {
-    addNoteButton.setOnClickListener { this.startActivity(SaveNoteActivity.newIntent(this)) }
   }
 
   override fun onResume() {
@@ -118,6 +79,77 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
     viewModel.fetchNotes()
   }
 
+  private fun requestToBeLayoutFullscreen() {
+    root.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+  }
+
+  private fun adaptViewForInsets() {
+
+    // Prepare original top padding of the toolbar
+    val toolbarOriginalTopPadding = toolbar.paddingTop
+
+    // Prepare original bottom margin of the "Add Note" button
+    val addNoteButtonMarginLayoutParam = addNoteButton.layoutParams as ViewGroup.MarginLayoutParams
+    val addNoteButtonOriginalBottomMargin = addNoteButtonMarginLayoutParam.bottomMargin
+
+    // Register OnApplyWindowInsetsListener
+    ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
+
+      // Update toolbar's top padding to accommodate system window top inset
+      val newToolbarTopPadding = windowInsets.systemWindowInsetTop + toolbarOriginalTopPadding
+      toolbar.updatePadding(top = newToolbarTopPadding)
+
+      // Update "Add Note" button's bottom margin to accommodate system window bottom inset
+      addNoteButtonMarginLayoutParam.bottomMargin =
+          addNoteButtonOriginalBottomMargin + windowInsets.systemWindowInsetBottom
+      addNoteButton.layoutParams = addNoteButtonMarginLayoutParam
+
+      // Update notes recyclerView's bottom padding to accommodate system window bottom inset
+      notes.updatePadding(bottom = windowInsets.systemWindowInsetBottom)
+
+      windowInsets
+    }
+
+  }
+
+  private fun initToolbar() {
+    // Set title in toolbar
+    screenTitle.setText(R.string.notes_overview_screen_title)
+  }
+
+  private fun initViewModel() {
+
+    // Create ViewModel
+    viewModel = ViewModelProviders.of(this).get(NotesOverviewViewModel::class.java)
+
+    // Observe LiveData
+    viewModel.notes.observe(this,
+        Observer<List<NoteOverviewItemData>> { notesOverviewAdapter.setData(it) }
+    )
+  }
+
+  private fun initNotesRecyclerView() {
+
+    // Initialize adapter
+    notesOverviewAdapter = NotesOverviewAdapter(layoutInflater)
+    notesOverviewAdapter.setOnNoteClickListener(this)
+
+    // Initialize layout manager
+    val layoutManager = LinearLayoutManager(this)
+    layoutManager.orientation = RecyclerView.VERTICAL
+
+    // Initialize notes recycler view
+    notes.layoutManager = layoutManager
+    notes.adapter = notesOverviewAdapter
+  }
+
+  private fun initAddNoteClickListener() {
+    // On "Add Note" button click, open SaveNoteActivity
+    addNoteButton.setOnClickListener { this.startActivity(SaveNoteActivity.newIntent(this)) }
+  }
+
+  // On Note click, open SaveNoteActivity but pass note's Id
   override fun onNoteClicked(noteId: Long) =
       this.startActivity(SaveNoteActivity.newIntent(this, noteId))
 }

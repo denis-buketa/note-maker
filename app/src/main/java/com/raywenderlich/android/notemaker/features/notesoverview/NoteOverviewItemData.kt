@@ -32,4 +32,7 @@ package com.raywenderlich.android.notemaker.features.notesoverview
 import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.data.model.Note
 
+/**
+ * Represents data for rendering one note item in the "Notes" screen.
+ */
 data class NoteOverviewItemData(val note: Note, val color: Color)
