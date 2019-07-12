@@ -30,7 +30,6 @@
 package com.raywenderlich.android.notemaker
 
 import android.app.Application
-import com.facebook.stetho.Stetho
 import com.raywenderlich.android.notemaker.dependecyInjector.DependencyInjector
 
 class NoteMakerApplication : Application() {
@@ -40,8 +39,6 @@ class NoteMakerApplication : Application() {
   override fun onCreate() {
     super.onCreate()
     initDependencyInjector()
-
-    Stetho.initializeWithDefaults(this)
   }
 
   private fun initDependencyInjector() {

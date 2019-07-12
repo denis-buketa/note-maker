@@ -34,6 +34,9 @@ import com.raywenderlich.android.notemaker.data.model.Note
 import io.reactivex.Completable
 import io.reactivex.Single
 
+/**
+ * Allows communication with the app's database.
+ */
 interface Repository {
 
   // notes

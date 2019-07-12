@@ -41,6 +41,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
+/**
+ * ViewModel for "Save Note" screen.
+ */
 class SaveNoteViewModel(application: Application) : AndroidViewModel(application) {
 
   companion object {
@@ -62,27 +65,36 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
   fun fetchViewData(noteId: Long) {
     this.noteId = noteId
 
+    // If noteId is invalid, the user is creating a new note
     if (noteId == INVALID_NOTE_ID) {
       viewData.value = SaveNoteViewData.DEFAULT
       return
     }
 
     compositeDisposable.add(
+        // Fetch note data
         fetchNoteRelatedData(noteId)
+            // Map data to ViewData
             .map { mapToViewData(it) }
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { viewData.value = it },
-                { Log.e("debug_log", "Error while fetching view data: $it") }
+                {
+                  Log.e(SaveNoteViewModel::class.java.name,
+                      "Error occurred while fetching note: $it"
+                  )
+                }
             )
     )
   }
 
   private fun fetchNoteRelatedData(noteId: Long): Single<NoteRelatedData> =
+      // Find Note by Id
       repository
           .findNoteById(noteId)
           .flatMap { note ->
+            // Find note's color
             repository
                 .findColorById(note.colorId)
                 .map { color -> NoteRelatedData(note, color) }
@@ -102,30 +114,42 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
               .observeOn(AndroidSchedulers.mainThread())
               .subscribe(
                   { colors.value = it },
-                  { Log.e("debug_log", "Error while fetching colors: $it") }
+                  {
+                    Log.e(SaveNoteViewModel::class.java.name,
+                        "Error occurred while fetching colors: $it"
+                    )
+                  }
               )
       )
 
   fun saveNote(title: String, noteContent: String) {
 
+    // For note to be valid, title should not be empty
     if (title.isEmpty()) {
       return
     }
 
+    // Get note color's id
     val noteColorId = viewData.value?.noteColor?.id ?: Color.DEFAULT_COLOR.id
 
+    // Create "New note" request or "Update request" depending on the note Id
     val note = if (noteId == INVALID_NOTE_ID)
       Note(title, noteContent, noteColorId)
     else
       Note(title, noteContent, noteColorId, noteId)
 
+    // Save note and close screen
     compositeDisposable.add(
         repository.insertNote(note)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { closeScreen() },
-                { Log.e("debug_log", "Error while saving note: $it") }
+                {
+                  Log.e(SaveNoteViewModel::class.java.name,
+                      "Error occurred while fetching colors: $it"
+                  )
+                }
             )
     )
   }
@@ -136,6 +160,7 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
       return
     }
 
+    // Delete note and close screen
     compositeDisposable.add(
         repository
             .deleteNote(noteId)
@@ -143,7 +168,11 @@ class SaveNoteViewModel(application: Application) : AndroidViewModel(application
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { closeScreen() },
-                { Log.e("debug_log", "Error while deleting note: $it") }
+                {
+                  Log.e(SaveNoteViewModel::class.java.name,
+                      "Error occurred while fetching colors: $it"
+                  )
+                }
             )
     )
   }

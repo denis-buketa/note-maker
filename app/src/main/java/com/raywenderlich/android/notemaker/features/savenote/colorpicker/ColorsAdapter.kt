@@ -39,6 +39,9 @@ import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.data.model.Color
 import kotlinx.android.synthetic.main.view_color.view.*
 
+/**
+ * Adapter for displaying colors in "Save Note" screen.
+ */
 class ColorsAdapter(
     private val layoutInflater: LayoutInflater
 ) : RecyclerView.Adapter<ColorsAdapter.ColorViewHolder>() {
@@ -74,7 +77,7 @@ class ColorsAdapter(
 
     fun bindData(color: Color) = with(view) {
 
-      /* Setup background color */
+      // Setup view's color
       val drawableBackground = colorView.background
       drawableBackground.colorFilter = PorterDuffColorFilter(
           android.graphics.Color.parseColor(color.hex),
@@ -82,6 +85,7 @@ class ColorsAdapter(
       )
       colorView.background = drawableBackground
 
+      // Setup color's onClick listener
       setOnClickListener { colorClickListener?.onColorClicked(color) }
     }
   }

@@ -35,16 +35,14 @@ import com.raywenderlich.android.notemaker.data.database.AppDatabase
 import com.raywenderlich.android.notemaker.data.repository.Repository
 import com.raywenderlich.android.notemaker.data.repository.RepositoryImpl
 
+/**
+ * Provides dependencies across the app.
+ */
 class DependencyInjector(applicationContext: Context) {
 
-  val repository: Repository
+  val repository: Repository by lazy { provideRepository(database) }
 
-  private val database: AppDatabase
-
-  init {
-    database = provideDatabase(applicationContext)
-    repository = provideRepository(database)
-  }
+  private val database: AppDatabase by lazy { provideDatabase(applicationContext) }
 
   private fun provideDatabase(applicationContext: Context): AppDatabase =
       Room.databaseBuilder(

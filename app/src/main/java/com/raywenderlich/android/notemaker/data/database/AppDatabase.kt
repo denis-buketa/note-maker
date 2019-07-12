@@ -34,6 +34,11 @@ import androidx.room.RoomDatabase
 import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.data.model.Note
 
+/**
+ * App's database.
+ *
+ * It contains two tables: Note table and Color table.
+ */
 @Database(entities = arrayOf(Note::class, Color::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {
 

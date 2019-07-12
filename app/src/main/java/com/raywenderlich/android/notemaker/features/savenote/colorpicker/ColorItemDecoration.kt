@@ -35,6 +35,12 @@ import androidx.recyclerview.widget.RecyclerView
 
 private const val FIRST_POSITION_INDEX = 0
 
+/**
+ * Decoration for Color items allows easy manipulation with margins of specific items.
+ *
+ * Put [outerMarginPx] on the left side of first item and right side of the last item in list.
+ * Put [innerMarginPx] between items.
+ */
 class ColorItemDecoration(
     private val outerMarginPx: Int,
     private val innerMarginPx: Int

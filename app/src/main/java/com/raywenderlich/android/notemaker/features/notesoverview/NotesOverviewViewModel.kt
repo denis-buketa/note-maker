@@ -40,6 +40,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
+/**
+ * ViewModel for "Notes" screen.
+ */
 class NotesOverviewViewModel(application: Application) : AndroidViewModel(application) {
 
   val notes = MutableLiveData<List<NoteOverviewItemData>>()
@@ -49,14 +52,19 @@ class NotesOverviewViewModel(application: Application) : AndroidViewModel(applic
 
   fun fetchNotes() {
     compositeDisposable.add(
+        // Get all notes from database
         repository
             .getAllNotes()
             .flatMapObservable { Observable.fromIterable(it) }
             .flatMapSingle { note ->
+
+              // For each note fetch its color
               repository
                   .findColorById(note.colorId)
                   .onErrorReturn { Color.DEFAULT_COLOR }
                   .map {
+
+                    // Map note and color into NoteOverviewItemData
                     NoteOverviewItemData(note, it)
                   }
             }
@@ -65,7 +73,11 @@ class NotesOverviewViewModel(application: Application) : AndroidViewModel(applic
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { notes.value = it },
-                { Log.e("debug_log", "Error while fetching notes: $it") }
+                {
+                  Log.e(NotesOverviewViewModel::class.java.name,
+                      "Error occurred while fetching notes: $it"
+                  )
+                }
             )
     )
   }
