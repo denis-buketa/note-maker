@@ -31,16 +31,19 @@ package com.raywenderlich.android.notemaker.features.savenote
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.doOnLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.features.savenote.SaveNoteViewModel.Companion.INVALID_NOTE_ID
@@ -118,6 +121,52 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
 
         val gestureInsets = windowInsets.systemGestureInsets
         bottomSheetBehavior.peekHeight = bottomSheetOriginalPeekHeight + gestureInsets.bottom
+
+        bottomSheetBehavior.setBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+          override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            /* NO OP */
+          }
+
+          override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState == STATE_EXPANDED) {
+
+              root.doOnLayout {
+
+                val rectHeight = colors.height
+                val rectTop = root.bottom - rectHeight
+                val rectBottom = root.bottom
+
+                val leftExclusionRectLeft = 0
+                val leftExclusionRectRight = gestureInsets.left
+
+                val rightExclusionRectLeft = root.right - gestureInsets.right
+                val rightExclusionRectRight = root.right
+
+                val leftExclusionRect = Rect(
+                    leftExclusionRectLeft,
+                    rectTop,
+                    leftExclusionRectRight,
+                    rectBottom
+                )
+                val rightExclusionRect = Rect(
+                    rightExclusionRectLeft,
+                    rectTop,
+                    rightExclusionRectRight,
+                    rectBottom
+                )
+
+                root.systemGestureExclusionRects = listOf(leftExclusionRect, rightExclusionRect)
+              }
+            } else {
+
+              root.doOnLayout {
+                root.systemGestureExclusionRects = listOf()
+              }
+            }
+          }
+        })
       }
 
       windowInsets
