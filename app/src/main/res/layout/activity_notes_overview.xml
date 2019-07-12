@@ -11,7 +11,7 @@
   <FrameLayout
       android:id="@+id/toolbar"
       android:layout_width="0dp"
-      android:layout_height="@dimen/toolbar_height"
+      android:layout_height="wrap_content"
       android:background="@color/colorPrimary"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,7 @@
     <TextView
         android:id="@+id/screenTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="@dimen/toolbar_height"
         android:gravity="center_vertical"
         android:paddingEnd="@dimen/toolbar_title_padding"
         android:paddingStart="@dimen/toolbar_title_padding"

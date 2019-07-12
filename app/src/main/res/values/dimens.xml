@@ -46,6 +46,8 @@
 
   <dimen name="bottom_sheet_peek_height">32dp</dimen>
 
+  <dimen name="bottom_sheet_option_margin_top">64dp</dimen>
+
   <dimen name="bottom_sheet_option_image_size">26dp</dimen>
   <dimen name="bottom_sheet_option_image_margin">16dp</dimen>
 

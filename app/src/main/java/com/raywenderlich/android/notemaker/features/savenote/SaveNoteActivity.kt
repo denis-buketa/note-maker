@@ -31,12 +31,15 @@ package com.raywenderlich.android.notemaker.features.savenote
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.data.model.Color
 import com.raywenderlich.android.notemaker.features.savenote.SaveNoteViewModel.Companion.INVALID_NOTE_ID
@@ -78,6 +81,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
     setContentView(R.layout.activity_add_note)
 
     requestToBeLayoutFullscreen()
+    handleInsets()
     extractArguments()
     initToolbar()
     initColors()
@@ -88,6 +92,35 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
   private fun requestToBeLayoutFullscreen() {
     root.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+  }
+
+  private fun handleInsets() {
+
+    val toolbarOriginalTopPadding = toolbar.paddingTop
+
+    val bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+    val bottomSheetOriginalPeekHeight = bottomSheetBehavior.peekHeight
+
+    val colorsLayoutParams = colors.layoutParams as ViewGroup.MarginLayoutParams
+    val colorsOriginalMarginBottom = colorsLayoutParams.bottomMargin
+
+    root.setOnApplyWindowInsetsListener { _, windowInsets ->
+
+      val newToolbarTopPadding = toolbarOriginalTopPadding + windowInsets.systemWindowInsetTop
+      toolbar.setPadding(0, newToolbarTopPadding, 0, 0)
+
+      val newColorsMarginBottom = colorsOriginalMarginBottom + windowInsets.systemWindowInsetBottom
+      colorsLayoutParams.bottomMargin = newColorsMarginBottom
+      colors.layoutParams = colorsLayoutParams
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+        val gestureInsets = windowInsets.systemGestureInsets
+        bottomSheetBehavior.peekHeight = bottomSheetOriginalPeekHeight + gestureInsets.bottom
+      }
+
+      windowInsets
+    }
   }
 
   private fun extractArguments() {

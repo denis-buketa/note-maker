@@ -31,7 +31,9 @@ package com.raywenderlich.android.notemaker.features.notesoverview
 
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -50,6 +52,7 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
     setContentView(R.layout.activity_notes_overview)
 
     requestToBeLayoutFullscreen()
+    handleInsets()
     initToolbar()
     initViewModel()
     initNotesRecyclerView()
@@ -59,6 +62,31 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
   private fun requestToBeLayoutFullscreen() {
     root.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
         or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+  }
+
+  private fun handleInsets() {
+
+    val toolbarOriginalTopPadding = toolbar.paddingTop
+
+    val addNoteButtonMarginLayoutParam = addNoteButton.layoutParams as ViewGroup.MarginLayoutParams
+    val addNoteButtonOriginalBottomMargin = addNoteButtonMarginLayoutParam.bottomMargin
+
+    root.setOnApplyWindowInsetsListener { _, windowInsets ->
+
+      val newToolbarTopPadding = windowInsets.systemWindowInsetTop + toolbarOriginalTopPadding
+      toolbar.setPadding(0, newToolbarTopPadding, 0, 0)
+
+      addNoteButtonMarginLayoutParam.bottomMargin =
+          addNoteButtonOriginalBottomMargin + windowInsets.systemWindowInsetBottom
+      addNoteButton.layoutParams = addNoteButtonMarginLayoutParam
+
+      windowInsets
+    }
+
+    notes.setOnApplyWindowInsetsListener { view, windowInsets ->
+      view.updatePadding(bottom = windowInsets.systemWindowInsetBottom)
+      windowInsets
+    }
   }
 
   private fun initToolbar() {
