@@ -36,6 +36,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -104,7 +105,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
     val colorsLayoutParams = colors.layoutParams as ViewGroup.MarginLayoutParams
     val colorsOriginalMarginBottom = colorsLayoutParams.bottomMargin
 
-    root.setOnApplyWindowInsetsListener { _, windowInsets ->
+    ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
 
       val newToolbarTopPadding = toolbarOriginalTopPadding + windowInsets.systemWindowInsetTop
       toolbar.setPadding(0, newToolbarTopPadding, 0, 0)

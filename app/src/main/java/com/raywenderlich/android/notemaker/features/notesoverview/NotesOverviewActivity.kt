@@ -33,6 +33,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -71,7 +72,7 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
     val addNoteButtonMarginLayoutParam = addNoteButton.layoutParams as ViewGroup.MarginLayoutParams
     val addNoteButtonOriginalBottomMargin = addNoteButtonMarginLayoutParam.bottomMargin
 
-    root.setOnApplyWindowInsetsListener { _, windowInsets ->
+    ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
 
       val newToolbarTopPadding = windowInsets.systemWindowInsetTop + toolbarOriginalTopPadding
       toolbar.setPadding(0, newToolbarTopPadding, 0, 0)
