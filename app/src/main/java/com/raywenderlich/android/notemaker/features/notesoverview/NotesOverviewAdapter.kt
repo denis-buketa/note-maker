@@ -40,7 +40,7 @@ import com.raywenderlich.android.notemaker.R
 import kotlinx.android.synthetic.main.view_note.view.*
 
 /**
- * Adapter for displaying notes.
+ * Adapter for displaying notes in "Notes" screen.
  */
 class NotesOverviewAdapter(
     private val layoutInflater: LayoutInflater
@@ -90,7 +90,7 @@ class NotesOverviewAdapter(
         )
         view.root.background = drawableBackground
 
-        // Setup note onClick listener
+        // Setup note's onClick listener
         view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
       }
     }

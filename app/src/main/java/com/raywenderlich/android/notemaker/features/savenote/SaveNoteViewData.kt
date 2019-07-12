@@ -31,6 +31,9 @@ package com.raywenderlich.android.notemaker.features.savenote
 
 import com.raywenderlich.android.notemaker.data.model.Color
 
+/**
+ * Represents data for rendering "Save Note" screen.
+ */
 data class SaveNoteViewData(
     val title: String,
     val note: String,
