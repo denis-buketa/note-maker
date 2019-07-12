@@ -30,6 +30,8 @@
 package com.raywenderlich.android.notemaker.features.notesoverview
 
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,7 +76,15 @@ class NotesOverviewAdapter(
       with(item) {
         view.title.text = note.title
         view.note.text = note.content
-        view.root.setBackgroundColor(Color.parseColor(color.hex))
+
+        /* Setup background color */
+        val drawableBackground = view.root.background
+        drawableBackground.colorFilter = PorterDuffColorFilter(
+            Color.parseColor(color.hex),
+            PorterDuff.Mode.MULTIPLY
+        )
+        view.root.background = drawableBackground
+
         view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
       }
     }

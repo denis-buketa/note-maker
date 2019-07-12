@@ -29,6 +29,8 @@
  */
 package com.raywenderlich.android.notemaker.features.savenote.colorpicker
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,9 +72,17 @@ class ColorsAdapter(
 
   inner class ColorViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
-    fun bindData(color: Color) {
-      view.colorView.setBackgroundColor(android.graphics.Color.parseColor(color.hex))
-      view.setOnClickListener { colorClickListener?.onColorClicked(color) }
+    fun bindData(color: Color) = with(view) {
+
+      /* Setup background color */
+      val drawableBackground = colorView.background
+      drawableBackground.colorFilter = PorterDuffColorFilter(
+          android.graphics.Color.parseColor(color.hex),
+          PorterDuff.Mode.MULTIPLY
+      )
+      colorView.background = drawableBackground
+
+      setOnClickListener { colorClickListener?.onColorClicked(color) }
     }
   }
 }
