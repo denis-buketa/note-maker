@@ -2,6 +2,9 @@
 
   <string name="app_name">Note Maker</string>
 
+  <string name="notes_overview_screen_title">Notes</string>
+  <string name="save_note_screen_title">Save Note</string>
+
   <string name="hint_title">Title</string>
   <string name="hint_note">Note</string>
 

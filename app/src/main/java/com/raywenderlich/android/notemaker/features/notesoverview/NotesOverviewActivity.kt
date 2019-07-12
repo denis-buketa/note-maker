@@ -30,6 +30,7 @@
 package com.raywenderlich.android.notemaker.features.notesoverview
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -48,14 +49,20 @@ class NotesOverviewActivity : AppCompatActivity(), NotesOverviewAdapter.OnNoteCl
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_notes_overview)
 
+    requestToBeLayoutFullscreen()
     initToolbar()
     initViewModel()
     initNotesRecyclerView()
     initAddNoteClickListener()
   }
 
+  private fun requestToBeLayoutFullscreen() {
+    root.systemUiVisibility = (View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+  }
+
   private fun initToolbar() {
-    supportActionBar?.title = "Notes"
+    screenTitle.setText(R.string.notes_overview_screen_title)
   }
 
   private fun initViewModel() {
