@@ -39,6 +39,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.raywenderlich.android.notemaker.R
 import kotlinx.android.synthetic.main.view_note.view.*
 
+/**
+ * Adapter for displaying notes.
+ */
 class NotesOverviewAdapter(
     private val layoutInflater: LayoutInflater
 ) : RecyclerView.Adapter<NotesOverviewAdapter.NoteViewHolder>() {
@@ -74,10 +77,12 @@ class NotesOverviewAdapter(
 
     fun bindData(item: NoteOverviewItemData) {
       with(item) {
+
+        // Setup note content
         view.title.text = note.title
         view.note.text = note.content
 
-        /* Setup background color */
+        // Setup note color
         val drawableBackground = view.root.background
         drawableBackground.colorFilter = PorterDuffColorFilter(
             Color.parseColor(color.hex),
@@ -85,6 +90,7 @@ class NotesOverviewAdapter(
         )
         view.root.background = drawableBackground
 
+        // Setup note onClick listener
         view.root.setOnClickListener { clickListener?.onNoteClicked(note.id) }
       }
     }
