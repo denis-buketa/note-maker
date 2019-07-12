@@ -36,6 +36,9 @@ import com.raywenderlich.android.notemaker.data.model.Color
 import io.reactivex.Completable
 import io.reactivex.Single
 
+/**
+ * Dao for managing Color table in the database.
+ */
 @Dao
 interface ColorDao {
 

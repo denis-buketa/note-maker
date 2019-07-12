@@ -37,6 +37,9 @@ import com.raywenderlich.android.notemaker.data.model.Note
 import io.reactivex.Completable
 import io.reactivex.Single
 
+/**
+ * Dao for managing Note table in the database.
+ */
 @Dao
 interface NoteDao {
 

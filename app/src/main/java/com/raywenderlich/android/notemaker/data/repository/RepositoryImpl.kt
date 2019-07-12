@@ -39,31 +39,39 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
-class RepositoryImpl(
-    private val noteDao: NoteDao,
-    private val colorDao: ColorDao
-) : Repository {
+/**
+ * {@inheritDoc}
+ */
+class RepositoryImpl(private val noteDao: NoteDao, private val colorDao: ColorDao) : Repository {
 
   init {
     prepopulateDatabase()
   }
 
+  /**
+   * Populates database with colors if it is empty.
+   */
   @SuppressLint("CheckResult")
   private fun prepopulateDatabase() {
+
     val colors = Color.DEFAULT_COLORS.toTypedArray()
+
     colorDao
         .getAll()
         .flatMapCompletable {
+
           if (it.isEmpty()) {
+            // Populate database since it is empty.
             colorDao.insertAll(*colors)
           } else {
+            // Do nothing. Database already contains colors.
             Completable.complete()
           }
         }
         .subscribeOn(Schedulers.io())
         .subscribe(
             { /* Colors inserted successfully */ },
-            { Log.e(Repository::class.java.name, "Error occurred while inserting colors") }
+            { Log.e(Repository::class.java.name, "Error occurred while inserting colors: $it") }
         )
 
   }

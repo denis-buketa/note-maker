@@ -39,10 +39,4 @@ data class Note(
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "color_id") val colorId: Long = 0,
     @PrimaryKey(autoGenerate = true) val id: Long = 0
-) {
-
-  companion object {
-
-    val EMPTY = Note("", "", 0, 0)
-  }
-}
+)
