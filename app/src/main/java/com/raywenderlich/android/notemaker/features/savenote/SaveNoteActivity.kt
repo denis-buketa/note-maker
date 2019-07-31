@@ -36,10 +36,9 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
@@ -128,7 +127,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
     val colorsOriginalMarginBottom = colorsLayoutParams.bottomMargin
 
     // Register OnApplyWindowInsetsListener
-    ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
+    root.setOnApplyWindowInsetsListener { _, windowInsets ->
 
       // Update toolbar's top padding to accommodate system window top inset
       val newToolbarTopPadding = toolbarOriginalTopPadding + windowInsets.systemWindowInsetTop
@@ -152,7 +151,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
   private fun adaptBottomSheetPeekHeight(
       bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>,
       bottomSheetOriginalPeekHeight: Int,
-      windowInsets: WindowInsetsCompat
+      windowInsets: WindowInsets
   ) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -170,7 +169,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
 
   private fun excludeGesturesForColors(
       bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>,
-      windowInsets: WindowInsetsCompat
+      windowInsets: WindowInsets
   ) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
