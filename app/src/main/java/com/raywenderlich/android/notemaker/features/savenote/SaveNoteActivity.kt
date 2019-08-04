@@ -36,16 +36,16 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.data.model.Color
@@ -128,7 +128,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
     val colorsOriginalMarginBottom = colorsLayoutParams.bottomMargin
 
     // Register OnApplyWindowInsetsListener
-    ViewCompat.setOnApplyWindowInsetsListener(root) { _, windowInsets ->
+    root.setOnApplyWindowInsetsListener { _, windowInsets ->
 
       // Update toolbar's top padding to accommodate system window top inset
       val newToolbarTopPadding = toolbarOriginalTopPadding + windowInsets.systemWindowInsetTop
@@ -152,7 +152,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
   private fun adaptBottomSheetPeekHeight(
       bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>,
       bottomSheetOriginalPeekHeight: Int,
-      windowInsets: WindowInsetsCompat
+      windowInsets: WindowInsets
   ) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -170,7 +170,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
 
   private fun excludeGesturesForColors(
       bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>,
-      windowInsets: WindowInsetsCompat
+      windowInsets: WindowInsets
   ) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -223,7 +223,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
               // Add both rects and exclude gestures
               root.systemGestureExclusionRects = listOf(leftExclusionRect, rightExclusionRect)
             }
-          } else if (newState == STATE_EXPANDED) {
+          } else if (newState == STATE_COLLAPSED) {
 
             // Remove exclusion rects when bottom sheet is collapsed
             root.doOnLayout { root.systemGestureExclusionRects = listOf() }
