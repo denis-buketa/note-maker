@@ -45,6 +45,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_COLLAPSED
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_EXPANDED
 import com.raywenderlich.android.notemaker.R
 import com.raywenderlich.android.notemaker.data.model.Color
@@ -222,7 +223,7 @@ class SaveNoteActivity : AppCompatActivity(), ColorsAdapter.OnColorClickListener
               // Add both rects and exclude gestures
               root.systemGestureExclusionRects = listOf(leftExclusionRect, rightExclusionRect)
             }
-          } else if (newState == STATE_EXPANDED) {
+          } else if (newState == STATE_COLLAPSED) {
 
             // Remove exclusion rects when bottom sheet is collapsed
             root.doOnLayout { root.systemGestureExclusionRects = listOf() }
