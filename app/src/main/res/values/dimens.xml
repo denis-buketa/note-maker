@@ -44,6 +44,8 @@
 
   <!-- Bottom Sheet -->
 
+  <dimen name="bottom_sheet_hint_margin_top">8dp</dimen>
+
   <dimen name="bottom_sheet_peek_height">32dp</dimen>
 
   <dimen name="bottom_sheet_option_margin_top">64dp</dimen>
